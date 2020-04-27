@@ -1,14 +1,38 @@
 import React, { useState } from "react";
+import axios from "axios";
+import Swal from "sweetalert2";
 
 function Login() {
     const [user, setUser] = useState({ email: null, password: null });
 
     // eslint-disable-next-line
-    const [err, setErr] = useState({ email: null, password: null });
 
-    const sendLoginForm = e => {
+    const sendLoginForm = async e => {
         e.preventDefault();
-        console.log(user);
+
+        const { data } = await axios.post("/api/users/login", {
+            email: user.email,
+            password: user.password,
+        });
+        if (data.response === "valid_user") {
+            Swal.fire({
+                title: "User validated",
+                icon: "success",
+                showConfirmButton: false,
+                toast: true,
+                position: "bottom-left",
+                timer: 5000,
+            });
+        } else {
+            Swal.fire({
+                title: "User or password is incorrect",
+                icon: "error",
+                showConfirmButton: false,
+                toast: true,
+                position: "bottom-left",
+                timer: 5000,
+            });
+        }
     };
 
     return (
@@ -22,10 +46,10 @@ function Login() {
                         }
                         type="email"
                         placeholder="Email"
+                        required
                     />
                     <span></span>
                 </div>
-                {err.email ? <span className="error">{err.email}</span> : null}
                 <div className="input">
                     <input
                         onChange={e =>
@@ -33,12 +57,10 @@ function Login() {
                         }
                         type="password"
                         placeholder="Password"
+                        required
                     />
                     <span></span>
                 </div>
-                {err.password ? (
-                    <span className="error">{err.password}</span>
-                ) : null}
                 <button type="submit" className="btn">
                     Sign In
                 </button>
